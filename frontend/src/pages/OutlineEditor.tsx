@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ArrowLeft, Save, ArrowRight, Plus } from 'lucide-react';
 import {
   DndContext,
@@ -50,7 +50,9 @@ const SortableCard: React.FC<{
 
 export const OutlineEditor: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { projectId } = useParams<{ projectId: string }>();
+  const fromHistory = (location.state as any)?.from === 'history';
   const {
     currentProject,
     syncProject,
@@ -123,7 +125,13 @@ export const OutlineEditor: React.FC = () => {
             variant="ghost"
             size="sm"
             icon={<ArrowLeft size={18} />}
-            onClick={() => navigate('/')}
+            onClick={() => {
+              if (fromHistory) {
+                navigate('/history');
+              } else {
+                navigate('/');
+              }
+            }}
           >
             返回
           </Button>
