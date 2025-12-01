@@ -11,8 +11,8 @@ type CreationType = 'idea' | 'outline' | 'description';
 
 const templates = [
   { id: '1', name: '简约商务', preview: '' },
-  { id: '2', name: '活力色彩', preview: '' },
-  { id: '3', name: '科技蓝', preview: '' },
+  { id: '2', name: '活力色彩', preview: '/templates/template_g.png' },
+  { id: '3', name: '科技蓝', preview: '/templates/template_b.png' },
 ];
 
 export const Home: React.FC = () => {
@@ -24,6 +24,7 @@ export const Home: React.FC = () => {
   const [content, setContent] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState<File | null>(null);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  const [selectedPresetTemplateId, setSelectedPresetTemplateId] = useState<string | null>(null);
   const [userTemplates, setUserTemplates] = useState<UserTemplate[]>([]);
   const [isLoadingTemplates, setIsLoadingTemplates] = useState(false);
 
@@ -90,11 +91,31 @@ export const Home: React.FC = () => {
 
   const handleSelectUserTemplate = (template: UserTemplate) => {
     setSelectedTemplateId(template.template_id);
+    setSelectedPresetTemplateId(null); // 清空预设模板选择
     setSelectedTemplate(null); // 清空本地文件选择
+  };
+
+  const handleSelectPresetTemplate = async (templateId: string, preview: string) => {
+    if (!preview) return; // 如果没有预览图，不处理
+    
+    setSelectedPresetTemplateId(templateId);
+    setSelectedTemplateId(null); // 清空用户模板选择
+    
+    // 从 public 文件夹加载图片并转换为 File 对象
+    try {
+      const response = await fetch(preview);
+      const blob = await response.blob();
+      const file = new File([blob], preview.split('/').pop() || 'template.png', { type: blob.type });
+      setSelectedTemplate(file);
+    } catch (error) {
+      console.error('加载预设模板失败:', error);
+      show({ message: '加载模板失败', type: 'error' });
+    }
   };
 
   const handleRemoveTemplate = () => {
     setSelectedTemplateId(null);
+    setSelectedPresetTemplateId(null);
     setSelectedTemplate(null);
   };
 
@@ -258,9 +279,29 @@ export const Home: React.FC = () => {
               {templates.map((template) => (
                 <div
                   key={template.id}
-                  className="aspect-[4/3] rounded-lg border-2 border-gray-200 hover:border-banana-500 cursor-pointer transition-all bg-gray-100 flex items-center justify-center"
+                  onClick={() => template.preview && handleSelectPresetTemplate(template.id, template.preview)}
+                  className={`aspect-[4/3] rounded-lg border-2 cursor-pointer transition-all bg-gray-100 flex items-center justify-center relative overflow-hidden ${
+                    selectedPresetTemplateId === template.id
+                      ? 'border-banana-500 ring-2 ring-banana-200'
+                      : 'border-gray-200 hover:border-banana-500'
+                  }`}
                 >
-                  <span className="text-sm text-gray-500">{template.name}</span>
+                  {template.preview ? (
+                    <>
+                      <img
+                        src={template.preview}
+                        alt={template.name}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                      {selectedPresetTemplateId === template.id && (
+                        <div className="absolute inset-0 bg-banana-500 bg-opacity-20 flex items-center justify-center">
+                          <span className="text-white font-semibold text-sm">已选择</span>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <span className="text-sm text-gray-500">{template.name}</span>
+                  )}
                 </div>
               ))}
 
@@ -279,10 +320,14 @@ export const Home: React.FC = () => {
             </div>
 
             {/* 显示已选择的模板提示 */}
-            {selectedTemplateId && (
+            {(selectedTemplateId || selectedPresetTemplateId) && (
               <div className="mt-4 flex items-center justify-between p-3 bg-banana-50 rounded-lg">
                 <span className="text-sm text-gray-700">
-                  已选择模板: {userTemplates.find(t => t.template_id === selectedTemplateId)?.name || '未命名模板'}
+                  已选择模板: {
+                    selectedTemplateId 
+                      ? userTemplates.find(t => t.template_id === selectedTemplateId)?.name || '未命名模板'
+                      : templates.find(t => t.id === selectedPresetTemplateId)?.name || '预设模板'
+                  }
                 </span>
                 <Button
                   variant="ghost"

@@ -1,4 +1,5 @@
 *.png
+!frontend/public/templates/*.png
 *.md
 !README.md
 *.pyc
