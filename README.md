@@ -183,14 +183,14 @@ docker compose up -d
 4. **查看日志**
 
 ```bash
-# 查看所有服务日志
-docker compose logs -f
+# 查看后端日志（实时查看最后50行）
+sudo docker compose logs -f --tail 50 backend
 
-# 查看后端日志
-docker compose logs -f backend
+# 查看所有服务日志
+sudo docker compose logs -f --tail 50
 
 # 查看前端日志
-docker compose logs -f frontend
+sudo docker compose logs -f --tail 50 frontend
 ```
 
 5. **停止服务**
