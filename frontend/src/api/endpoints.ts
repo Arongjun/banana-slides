@@ -649,3 +649,16 @@ export const associateFileToProject = async (
   return response.data;
 };
 
+/**
+ * 从项目中移除参考文件（不删除文件本身）
+ * @param fileId 文件ID
+ */
+export const dissociateFileFromProject = async (
+  fileId: string
+): Promise<ApiResponse<{ file: ReferenceFile; message: string }>> => {
+  const response = await apiClient.post<ApiResponse<{ file: ReferenceFile; message: string }>>(
+    `/api/reference-files/${fileId}/dissociate`
+  );
+  return response.data;
+};
+
