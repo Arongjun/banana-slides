@@ -19,7 +19,7 @@ class Project(db.Model):
     extra_requirements = db.Column(db.Text, nullable=True)  # 额外要求，应用到每个页面的AI提示词
     creation_type = db.Column(db.String(20), nullable=False, default='idea')  # idea|outline|descriptions
     template_image_path = db.Column(db.String(500), nullable=True)
-    template_style = db.Column(db.Text, nullable=True)  # 风格描述文本（无模板模式）
+    template_style = db.Column(db.Text, nullable=True)  # 风格描述文本（无模板图模式）
     status = db.Column(db.String(50), nullable=False, default='DRAFT')
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)

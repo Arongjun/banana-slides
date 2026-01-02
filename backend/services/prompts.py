@@ -304,7 +304,7 @@ def get_image_generation_prompt(page_desc: str, outline_text: str,
         has_material_images: 是否有素材图片
         extra_requirements: 额外的要求（可能包含风格描述）
         language: 输出语言
-        has_template: 是否有模板图片（False表示无模板模式）
+        has_template: 是否有模板图片（False表示无模板图模式）
         
     Returns:
         格式化后的 prompt 字符串
