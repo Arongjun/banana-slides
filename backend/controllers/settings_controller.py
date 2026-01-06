@@ -280,6 +280,19 @@ def _sync_settings_to_config(settings: Settings):
         current_app.config["IMAGE_CAPTION_MODEL"] = settings.image_caption_model
         logger.info(f"Updated IMAGE_CAPTION_MODEL to: {settings.image_caption_model}")
 
+    if settings.output_language:
+        current_app.config["OUTPUT_LANGUAGE"] = settings.output_language
+        logger.info(f"Updated OUTPUT_LANGUAGE to: {settings.output_language}")
+    
+    # Clear AI service cache if AI-related configuration changed
+    if ai_config_changed:
+        try:
+            from services.ai_service_manager import clear_ai_service_cache
+            clear_ai_service_cache()
+            logger.warning("AI configuration changed - AIService cache cleared. New providers will be created on next request.")
+        except Exception as e:
+            logger.error(f"Failed to clear AI service cache: {e}")
+
 
 @settings_bp.route("/auth/check", methods=["GET"], strict_slashes=False)
 def check_settings_auth():
@@ -350,15 +363,3 @@ def verify_settings_password():
             f"Failed to verify settings password: {str(e)}",
             500,
         )
-    if settings.output_language:
-        current_app.config["OUTPUT_LANGUAGE"] = settings.output_language
-        logger.info(f"Updated OUTPUT_LANGUAGE to: {settings.output_language}")
-    
-    # Clear AI service cache if AI-related configuration changed
-    if ai_config_changed:
-        try:
-            from services.ai_service_manager import clear_ai_service_cache
-            clear_ai_service_cache()
-            logger.warning("AI configuration changed - AIService cache cleared. New providers will be created on next request.")
-        except Exception as e:
-            logger.error(f"Failed to clear AI service cache: {e}")
